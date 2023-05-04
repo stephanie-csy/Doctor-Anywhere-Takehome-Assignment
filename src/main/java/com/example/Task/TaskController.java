@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/tasks")
@@ -19,7 +20,8 @@ public class TaskController {
     @PostMapping
     public Task createTask(@RequestBody Task task) {
         if (task.getId() == null) {
-            task.setId((long) (taskList.size() + 1));
+            Long lastID = taskList.get(taskList.size() - 1).getId();
+            task.setId(lastID + 1);
             taskList.add(task);
             return task;
         } else {
@@ -30,8 +32,11 @@ public class TaskController {
 
     @GetMapping("/{id}")
     public Task getTaskById(@PathVariable Long id) {
-        if (taskList.size() >= id) {
-            return taskList.get((int) (id-1));
+        Optional<Task> task = taskList.stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst();
+        if (task.isPresent()) {
+            return task.get();
         } else {
             throw new TaskNotFoundException(id);
         }
@@ -41,31 +46,37 @@ public class TaskController {
     public Task updateTaskById(@PathVariable Long id, @RequestBody Task task) {
         if (task.getId() != null) {
             throw new InvalidRequestException();
-        } else if (taskList.size() >= id) {
-            Task taskToUpdate = taskList.get((int) (id-1));
-
-            if (task.getTitle() != null) {
-                taskToUpdate.setTitle(task.getTitle());
-            }
-
-            if (task.getDescription() != null) {
-                taskToUpdate.setDescription(task.getDescription());
-            }
-
-            if (task.getCompleted() != null) {
-                taskToUpdate.setCompleted(task.getCompleted());
-            }
-
-            return taskToUpdate;
         } else {
-            throw new TaskNotFoundException(id);
+            Optional<Task> taskToUpdate = taskList.stream()
+                    .filter(t -> t.getId().equals(id))
+                    .findFirst();
+            if (taskToUpdate.isPresent()) {
+                if (task.getTitle() != null) {
+                    taskToUpdate.get().setTitle(task.getTitle());
+                }
+
+                if (task.getDescription() != null) {
+                    taskToUpdate.get().setDescription(task.getDescription());
+                }
+
+                if (task.getCompleted() != null) {
+                    taskToUpdate.get().setCompleted(task.getCompleted());
+                }
+
+                return taskToUpdate.get();
+            } else {
+                throw new TaskNotFoundException(id);
+            }
         }
     }
 
     @DeleteMapping("/{id}")
     public String deleteTaskById(@PathVariable Long id) {
-        if (taskList.size() >= id) {
-            taskList.remove((int) (id-1));
+        Optional<Task> task = taskList.stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst();
+        if (task.isPresent()) {
+            taskList.remove(task);
             return "Task " + id + " successfully deleted.";
         } else {
             throw new TaskNotFoundException(id);
