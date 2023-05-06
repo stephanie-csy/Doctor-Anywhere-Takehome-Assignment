@@ -3,14 +3,12 @@ This is a simple RESTful API built with Java and Sprint Boot to implement a task
 
 ### Prerequisites
 * Java 11 or higher
-* MySQL server
 * Maven
 
 ### Installation
 1. Clone the repository to your local machine.
 2. Open the project in your preferred IDE (e.g. IntelliJ IDEA, Eclipse, VS Code).
-3. Configure the database connection in the application.properties file.
-4. Run the project using Maven.
+3. Run the project using Maven.
 
 ### Overview
 The API provides the following endpoints:

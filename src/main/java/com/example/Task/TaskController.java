@@ -94,6 +94,7 @@ public class TaskController {
     public String handleInvalidRequest(InvalidRequestException ex) {
         return ex.getMessage();
     }
+
     @ExceptionHandler(TaskNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleTaskNotFound(TaskNotFoundException ex) {
