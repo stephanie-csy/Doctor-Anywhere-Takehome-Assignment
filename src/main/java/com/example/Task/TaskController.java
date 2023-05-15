@@ -20,7 +20,10 @@ public class TaskController {
     @PostMapping
     public Task createTask(@RequestBody Task task) {
         if (task.getId() == null) {
-            Long lastID = taskList.get(taskList.size() - 1).getId();
+            Long lastID = 0L;
+            if (taskList.size() > 0) {
+                lastID = taskList.get(taskList.size() - 1).getId();
+            }
             task.setId(lastID + 1);
             taskList.add(task);
             return task;
